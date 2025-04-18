@@ -1,0 +1,209 @@
+#:set primary_color (0.25, 0.25, 0.25, 1)
+#:set number_button_color (0.25, 0.25, 0.25, 1) 
+#:set number_button_press (0.35, 0.35, 0.35, 1)
+#:set op_button_color (0.35, 0.35, 0.35, 1)
+#:set op_button_pressed (0.45, 0.45, 0.45, 1)
+#:set equals_btn_color (0.1, 0.4, 0.8, 1)
+#:set equals_btn_pressed (0.2, 0.5, 0.9, 1)
+#:set bg_color (0.15, 0.15, 0.15, 1)
+#:set history_bg_color (0.08, 0.08, 0.08, 1)
+#:set light_topbar_color (0.9, 0.9, 0.9, 1)
+
+#:set light_number_button_color (0.85, 0.85, 0.85, 1)
+#:set light_number_button_press (0.75, 0.75, 0.75, 1)
+#:set light_op_button_color (0.75, 0.75, 0.75, 1)
+#:set light_op_button_pressed (0.65, 0.65, 0.65, 1)
+#:set light_equals_btn_color (0.9, 0.6, 0.7, 1)
+#:set light_equals_btn_pressed (0.95, 0.7, 0.75, 1)
+#:set light_bg_color (0.95, 0.95, 0.95, 1)
+#:set light_history_bg_color (0.9, 0.9, 0.9, 1)
+
+<ToggleCalcButton@ToggleButton>:
+    font_size: 24
+    size_hint: 1, 1
+    background_normal: ''
+    background_down: ''
+    background_color: 0, 0, 0, 0
+    bold: True
+    background_color_normal: number_button_color if app.theme == 'dark' else light_number_button_color
+    background_color_down: number_button_press if app.theme == 'dark' else light_number_button_press
+    canvas.before:
+        Color:
+            rgba: self.background_color_normal if self.state == 'normal' else self.background_color_down
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [3, 3, 3, 3]
+    on_press:
+        self.opacity = 0.9
+    on_release:
+        self.opacity = 1
+    color: [1, 1, 1, 1] if app.theme == 'dark' else [0, 0, 0, 1]
+
+<OperationButton@ToggleCalcButton>:
+    background_color_normal: op_button_color if app.theme == 'dark' else light_op_button_color
+    background_color_down: op_button_pressed if app.theme == 'dark' else light_op_button_pressed
+
+<EqualsButton@ToggleCalcButton>:
+    background_color_normal: equals_btn_color if app.theme == 'dark' else light_equals_btn_color
+    background_color_down: equals_btn_pressed if app.theme == 'dark' else light_equals_btn_pressed
+
+<IconButton@ButtonBehavior+Image>:
+    size_hint: None, None
+    size: dp(30), dp(30)
+    source: ""
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, 0  # fully transparent
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+
+
+<SwitchToggle@FloatLayout>:
+    size_hint: None, None
+    size: dp(55), dp(25)
+    on_touch_down: app.on_theme_toggle_touch(self, args[1])
+    canvas.before:
+        Color:
+            rgba: [0.4, 0.4, 0.4, 1] if app.theme == 'dark' else [0.75, 0.75, 0.75, 1]
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [15]
+
+    Image:
+        source: 'dark_mode.png'
+        allow_stretch: True
+        keep_ratio: False
+        size_hint: None, None
+        size: dp(20), dp(20)
+        pos_hint: {"x": 0.05, "center_y": 0.5}
+        opacity: 1 if app.theme == 'dark' else 1
+
+
+
+    Image:
+        source: 'light_mode.png'
+        allow_stretch: True
+        keep_ratio: False
+        size_hint: None, None
+        size: dp(20), dp(20)
+        pos_hint: {"x": 0.6, "center_y": 0.5}
+        opacity: 0 if app.theme == 'light' else 1
+
+
+    Widget:
+        id: knob
+        size_hint: None, None
+        size: dp(24), dp(24)
+        pos_hint: {"x": 0 if app.theme == 'dark' else 0.6, "center_y": 0.5}
+        canvas:
+            Color:
+                rgba: 1, 1, 1, 1
+            Ellipse:
+                pos: self.pos
+                size: self.size
+
+<MyWidget>:
+    FloatLayout:
+        canvas.before:
+            Color:
+                rgba: bg_color if app.theme == 'dark' else light_bg_color
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: 1, 1
+
+            # Top bar
+            BoxLayout:
+                size_hint_y: None
+                height: dp(40)
+                padding: dp(10), 0
+                spacing: dp(10)
+                canvas.before:
+                    Color:
+                        rgba: primary_color if app.theme == 'dark' else light_topbar_color
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+                SwitchToggle:
+                    pos_hint: {"right": 0.95, "center_y": 0.5}
+
+                Label:
+                    text: "Calculator"
+                    font_size: 20
+                    color: [1, 1, 1, 1] if app.theme == 'dark' else [0, 0, 0, 1]
+                    halign: 'center'
+                    #valign: 'middle'
+
+                Widget:
+                    size_hint_x: 0.1
+
+
+                IconButton:
+                    id: toggle_btn
+                    source: 'history_light.png' if app.theme == 'dark' else 'history_dark.png'
+                    on_press: root.Toggle_history()
+                    pos_hint: {"x": 0, "top": 1}
+                    size_hint: None, None
+                    size: dp(36), dp(36)
+                    padding: dp(5)
+                        
+
+            TextInput:
+                id: expression
+                font_size: 25
+                size_hint_y: None
+                height: 200
+                background_color: bg_color if app.theme == 'dark' else light_bg_color
+                foreground_color: [1, 1, 1, 1] if app.theme == 'dark' else [0, 0, 0, 1]
+                background_normal: ''
+                background_active: ''
+                cursor_color: [1, 1, 1, 1] if app.theme == 'dark' else [0, 0, 0, 1]
+                halign: 'right'
+
+            GridLayout:
+                id: button_grid
+                cols: 4
+                rows: 5
+                spacing: 3
+                size_hint_y: .75
+                padding: 5
+
+        BoxLayout:
+            id: history_panel
+            orientation: 'vertical'
+            size_hint: None, .9
+            width: 0
+            pos_hint: {"x": 0, "y": 0}
+            padding: 15
+            spacing: 10
+            canvas.before:
+                Color:
+                    rgba: history_bg_color if app.theme == 'dark' else light_history_bg_color
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            ScrollView:
+                Label:
+                    id: his
+                    text: "History"
+                    size_hint_y: None
+                    height: self.texture_size[1]
+                    text_size: self.width, None
+                    color: [1, 1, 1, 1] if app.theme == 'dark' else [0, 0, 0, 1]
+                    halign: "left"
+                    valign: "top"
+                    padding: [10, 10]
+
+            
+
+
+
+
